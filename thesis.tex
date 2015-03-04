@@ -1,16 +1,20 @@
-ss[12pt,oneside,draft]{fithesis2}
-\usepackage[english]{babel} % package for multilingual support
-\usepackage[cp1250]{inputenc} % Windows OS encoding
+\documentclass[12pt,oneside,draft]{fithesis2}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[plainpages=false,pdfpagelabels,unicode]{hyperref}
-\thesistitle{Sample thesis} % enter thesis title
-\thesissubtitle{Bachelor thesis}
-\thesisstudent{Jane Doe} % name of the author
-\thesiswoman{true} % defines author’s gender
+\usepackage{indentfirst}
+\usepackage{setspace}
+\thesistitle{Real time collaboration in Komodo} 
+\thesislogo{fi-logo.mf}
+\thesissubtitle{Master's thesis}
+\thesisstudent{Bc. Matúš Makový} 
+\thesiswoman{false} 
+\thesislang{en} 
 \thesisfaculty{fi}
-\thesisyear{spring 2008}
-\thesisadvisor{John Foo, Ph.D.} % fill in advisor’s name
-\thesislang{en} % thesis is in English
+\thesisyear{Spring 2015}
+\thesisadvisor{RNDr. Filip Nguyen} 
+\onehalfspacing
 \begin{document}
 \FrontMatter
 \ThesisTitlePage
@@ -19,22 +23,21 @@ ss[12pt,oneside,draft]{fithesis2}
 \AdvisorName
 \end{ThesisDeclaration}
 \begin{ThesisThanks}
-I would like to thank my supervisor...
+%Thank you
 \end{ThesisThanks}
 \begin{ThesisAbstract}
-The aim of the bachelor work is to provide...
+%Abstract
 \end{ThesisAbstract}
 \begin{ThesisKeyWords}
-keyword1, keyword2, etc.
+%Keywords
 \end{ThesisKeyWords}
+\tableofcontents 
 \MainMatter
-\chapter{Introduction}
-This is the first chapter of the thesis.
-\chapter{Another chapter}
-...
-\tableofcontents % prints table of contents
-\chapter{Introduction} % first chapter followed by
-% many others
-\bibliographystyle{plain} % sets plain bibliography style
-\bibliography{bib-db} % BibTeX database file
+\chapter{Introduction} 
+Many software solutions enable people to create new things in a better and faster way. In most cases the resulting product should be so complex that one person is not enuogh for the successful and fast creation. Creators try to collaborate to achive a common goal. Among other opportunities and possibilities are collaboration and sharing are the greatest benefits of the Internet. \par
+At the beginning, as the Internet didn't have such capacity, people tried to use it just for sharing their drafts of work and sending them to each other. This enabled creators to copperate, but they could not work at the same time without having to synchronize their drafts. In other words, they had to find differences between their drafts and reflect them to each other's version. \par
+With the development of the Internet came a reasonable solution called real-time collaboration. Using this principle, author can see what his collaborator is doing and the manual synchronization is not necessary. As the manual synchronization disappears information technologies have to do this work for their users.\par
+In the theoretical part of this thesis, author deals with principles of real-time collaboration and describes some of the techniques used to implement real-time collaboration in software over the Internet. There is also a comparison of these techniques from various aspects. The practical part of this thesis deals with JBoss Data Virtualization and Komodo software as a new version of Teiid Designer developed by Red Hat that should use real-time collaboration in its upcomming release. Author recommends best technique for this authoring software regarding the requirements of data models and finds a suitable implementation in Java programming language.
+\bibliographystyle{plain} 
+\bibliography{bib-db} 
 \end{document}
