@@ -1,0 +1,36 @@
+\begin{thebibliography}{1}
+
+\bibitem{Ellis}
+{\sc Ellis, C.~A., and Gibbs, S.~J.}
+\newblock Concurrency control in groupware systems.
+\newblock {\em SIGMOD Rec. 18}, 2 (June 1989), 399--407.
+
+\bibitem{Jupiter}
+{\sc Nichols, D.~A., Curtis, P., Dixon, M., and Lamping, J.}
+\newblock High-latency, low-bandwidth windowing in the jupiter collaboration
+  system.
+\newblock In {\em Proceedings of the 8th Annual ACM Symposium on User Interface
+  and Software Technology\/} (New York, NY, USA, 1995), UIST '95, ACM,
+  pp.~111--120.
+
+\bibitem{Spiewak}
+{\sc Spiewak, D.}
+\newblock Understanding and applying operational transformation, 2015.
+
+\bibitem{Sun}
+{\sc Sun, C., Jia, X., Zhang, Y., Yang, Y., and Chen, D.}
+\newblock Achieving convergence, causality preservation, and intention
+  preservation in real-time cooperative editing systems.
+\newblock {\em ACM Trans. Comput.-Hum. Interact. 5}, 1 (Mar. 1998), 63--108.
+
+\bibitem{Vidot}
+{\sc Vidot, N., Cart, M., Ferri{\'e}, J., and Suleiman, M.}
+\newblock Copies convergence in a distributed real-time collaborative
+  environment.
+\newblock 171--180.
+
+\bibitem{Google}
+{\sc Wang~D., Mah~A., L.~S.}
+\newblock Wave protocol google code, 2010.
+
+\end{thebibliography}

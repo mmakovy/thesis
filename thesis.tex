@@ -1,4 +1,4 @@
-\documentclass[12pt,oneside,draft]{fithesis2}
+\documentclass[12pt,oneside]{fithesis2}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -6,6 +6,9 @@
 \usepackage[plainpages=false,pdfpagelabels,unicode]{hyperref}
 \usepackage{indentfirst}
 \usepackage{setspace}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{float}
 \thesistitle{Real-time collaboration in Komodo} 
 \thesislogo{fi-logo.mf}
 \thesissubtitle{Master's thesis}
@@ -60,11 +63,46 @@ In non real-time collaboration users work on separate copies of a project and th
 \end{enumerate}
 \par Because the real-time collaboration is asychnronious there rises a problem of concurency. This means, that changes can happen at the same time and in the same sections of project. Good conflict resolution requirement is present because of concurency. Implementation techniques have to be able to identify and resolve a conflict when users are editing the same part of the project. \par The concurrency control algorithms are separeted in two classes: pessimistic and optimistic. \par Pessimistic algorithms require communication with other sites or with a central coordinator before making a change to data. \par Optimistic concurrency control, on the other hand, requires no communication before applying changes locally. The party making a change applies it immediately, then informs the other parties of the action. If more than one participant makes a change at the same time, a conflict resolution algorithm creates compensating changes to move everyone to the same final state.\cite{Jupiter} This implies that optimistic algorithms are better solution for Internet, because we can not guarantee the latency.
 \section{Operational Transformation}
-\par Operational transformation (OT) is optimistic concurrency control algorithm used for real-time collaborative editing over the Internet. The basic idea is that data are replicated on every machine and the only information that is sent over the Internet are the operations.
-\par It was first introduced in \cite{Ellis} in 1989 together with The Distrubeted Optional Transformation (dOPT) Algorithm. As the article describes it, algorithm has a number of properties which make it suitable for groupware. First, operations are performed immediately on their originating site, thus responsiveness is good. Secondly, locks are not necessary so all data remains accessible to group members. Finally, the algorithm is fully distributed, and resilient to site failure.
-\par The first algorithm was able to process only plain text. Later some problems with correctnes were discovered and resolved in following works. Over the years many other algorithms implementing OT have been published. Algorithms used today are able to process also XML and other formats. OT was used also in Jupiter Collaboration System in 1995 \cite{Jupiter} Jupiter's two-way algorithm is derived from the dOPT algorithm used by Grove in \cite{Ellis}. The algorithm used in Jupiter is one of the imporovments of dOPT. Today is Google one of the most common implementators of this protocol. The main application was in Google Wave project, which is now terminated , although Operational Transformation found application also in Google Docs project. According to \cite{Spiewak} Google is one of the bigest inovators of this approach an it's biggest contribution is the idea of operation compositon, which is described later in this section. The approches differ also in the architecture, dOPT doesn't involve server in its design, but the recent algorithms use a central server.
+\par Operational transformation (OT) is optimistic concurrency control algorithm used for real-time collaborative editing over the Internet. 
+\par It was first introduced in paper Concurency Control in Groupware Systems\cite{Ellis} in 1989, together with The Distrubeted Optional Transformation (dOPT) Algorithm. As the paper describes it, algorithm has a number of properties which make it suitable for groupware. First, operations are performed immediately on their originating site, thus responsiveness is good. Secondly, locks are not necessary so all data remains accessible to group members. Finally, the algorithm is fully distributed, and resilient to site failure. This first algorithm was able to process only plain text. Later some problems with correctnes were discovered and resolved in following works. Over the years many other algorithms implementing OT have been published. Algorithms used today are able to process also XML and other formats. \par OT was used also in Jupiter Collaboration System in 1995 \cite{Jupiter}. Jupiter's two-way algorithm is derived from the dOPT algorithm used by Grove in \cite{Ellis}. This algrithm is one of the imporovments of dOPT. \par Today is Google one of the most common implementators of this protocol. The main application was in Google Wave project, which is now terminated , although Operational Transformation found application also in Google Docs project. According to \cite{Spiewak} Google is one of the bigest inovators of this approach an it's biggest contribution is the idea of operation compositon, which is described later in this section. \par The approches differ also in the architecture, dOPT doesn't involve server in its design, but the recent algorithms use a central server.
 \par This section will explain basic principles of Operational transformation using Google version of the algorithm and then introduce other algorithms, like dOTP, Jupiter and AT(TIPS). It will also point out the differences in this algorithms compared to Google OT. 
-\par The main building block of this approach, as the name suggests, is an operation. A set of operations that can be executed on the document is defined, SET OF OPERATIONS. The operation is executed locally and then sent over the network to the server or to other peers, depending on the implemented architecture of the system, to execute the operation on their version of the project. Every object that can be changed in the document has its index for identification. Google Wave uses XML as format for storing information so as an object is considered a character in text and also a starting and terminating element in XML structure. The second major part of this technique is a transformation function. Operations sent over the network and recieved by peer or server can not be executed directly on the server version of the document, because the index of the desired element could be different in the local copy and in the server copy of the document. Let's explain this issue using an example.
+\par The basic idea is that data are replicated on every machine and the only information that is sent over the Internet are the operations. Data replication ensures good responsivnes in high latency enviroments. Wave's addition to OT are also annotations. An annotation is some meta-data associated with an item range, i.e., a start position and an end position. This is particularly useful for describing text formatting and spelling suggestions, as it does not unecessarily complicate the underlying structured document format.\cite{Google} \par The main building block of this approach, as the name suggests, is an operation. Here are some operations defined for use in Google Wave\cite{Google}:
+\begin{itemize}
+\item retain - move cursor
+\item insert characters - inserts texts
+\item insert element start - inserts starting tag
+\item insert element end - inserts end tag
+\item delete characters - deletes text
+\item delete element start - deletes starting tag
+\item delete element end - deletes ending tag
+\item replace attributes - replaces attributes in tag
+\item update attributes - updates attributes in tah
+\item annotation boundary - describes changes in annotations
+\end{itemize}
+\par The operation is executed locally and then sent over the network to the server or to other peers, depending on the implemented architecture of the system, to execute the operation on their version of the document. Every object that can be changed in the document has its index for identification. Google Wave uses XML as format for storing information so as an object is considered a character in text and also a starting and terminating tag in XML structure (characters of tags are not considered elements). 
+\par The second major part of this technique is a transformation algorithm, that transforms operations. Operations which are sent over the network and recieved by server can not be executed directly on the server's version of the document, because the index of the desired element could be different in the local copy and in the server copy of the document and this can cause inconsistency and violation of User Intension Preservation. 
+\par See an example for better explanation. For the purpose of this example and for the explanation of importance of transform algorithm, let's assume we have 2 peers that send operations done on their local copcopies to each other. 
+\begin{figure}[H]
+\caption{Example 1}
+\centering
+\includegraphics{example}
+\end{figure}
+Both of them start with text 'VWXYZ' in their document. First peer wants to delete character 'X' so he executes operations:
+\begin{verbatim}
+retain(3);
+deleteCharacters(1);
+\end{verbatim} 
+Second peer wants to delete character 'Y' so he executes operations: 
+\begin{verbatim}
+retain(4);
+deleteCharacter(1);
+\end{verbatim}
+Different order and change of indexes on both sides of the collaboration result in incosistent document state. String in first document is 'VWY' and string in second document is 'VWZ'.  In order to preserve user's intension and to reach correct result we have to transform this operations. The correct result after deleting letters 'X' and 'Y' should be 'VWZ'. The second peer has a correct result but the first peer doesn't so we have to transform the operation sent by second peer to look like this:
+\begin{verbatim}
+retain(3);
+deleteCharacter(1);
+\end{verbatim}
+After this change the result of applying operations on both sides will be correct.
 \section{Differential Synchronization}
 \section{Commutative Replicated Data Types}
 \chapter{Comparison of Techniques}
