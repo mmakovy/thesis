@@ -149,6 +149,18 @@ This example is used in \cite{Spiewak} On the server side, tranformation for ope
 \par The difference between Google algorithm and Jupiter is not so significant. Actually, Jupiter also uses tranformation fucntion, it is called xform, although it is very similar to dOPT transformation matrix. Only differences is that Jupiter doesn't use the operation composition. According to \cite{Jupiter} this algorithm assumes use of transport layer that delivers data in right order, such as TCP.
 \par The last major algorithm implementing this technique is TIPS, which is modern and based on the admissibility-based trasnformation (ABT) framework. It is created on top of HTTP protocol. Main difference is that clients can join and leave session at any time and the algorithm is more reliable when network failures can be expected. 
 \section{Differential Synchronization}
+\par Differential synchronization is the second tchnique used for real-time collaboration. It was fully described in 2009 by Neil Fraser in paper Differential Synchronization\cite{Fraser}. This section will describe and explain this technique, point out its advatages and disadvatages. As the main source of this information will be used paper mentioned above. 
+\par DS also replicates data on all sites of collaboration and identical code runs on both server and client, so it is symmetrical. The main building block is the presence of diff \& patch algorithms. Diff algorithm is able to compute a difference between to documents and save it in apropriate format for the patch algorithm, wich is able to apply these changes on the other copy. The patch algorithm must be fuzzy, this means that the changes may be applied even if the document has changed in the meentime, because Differential Sychronization is an optimistic technique. The final version presented by Neil Fraser is suitable for unreliable networks and networks with high-latency. This property will be described later in this section.
+\par The key feature of DS is that it is simple and well suited for use in both novel and existing state-based applications without requireing application redesign.\cite{Fraser} Differential Synchronization is able to process variety of formats, not only plain text. As long as there is a diff and patch algorithm available for the desired format, DS is able to use it. It is implemented and used in MobWrite. 
+\par Basic priciple of this tehcnique can be described using data flow diagram in Figure 2.4 originaly presented in \cite{Fraser}.  
+\par In the begining Client text, Server text and Common Shadow are the same. Client text and Server text represent 2 sites of the collaboration. The goal is to keep them updated. Client and Server are allowed to make changes in their documents at any time. 
+\begin{figure}[H]
+\caption{Differential synchronization}
+\centering
+\vspace{5mm}
+\includegraphics[scale=0.55]{diff1}
+\end{figure}
+After specified time interval a snapshot of Client text is taken and using a diff algorithm difference between snapshot and common shadow is computed. Common shadow represets the last common document state before any edits have been made. This diff returns changes that have been performed by Client. The snapshot is copied over to the common shadow and the changes are patched on the Server text. Now the proces repeats symmetrically using the server text in order to apply changes made by server or other clients on the client text.
 \section{Commutative Replicated Data Types}
 \chapter{Comparison of Techniques}
 \section{Comparison Criteria}
