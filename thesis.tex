@@ -218,8 +218,8 @@ Using these two operations it is possible to produce all other needed operations
 \item There exists a total order of identifiers.
 \item It is always possible to generate new identifier between any two identifiers. Generally, for any two identifiers \(A\) and \(B\), such that \(A < B\) we are able to create new identifier \(C\), such that \(A < C < B\).
 \end{itemize}
-Fundamental principle of this technique is that operations are executed localy and sent over the network to all other peers. There should be no need to preserve the order of the operations, this is due to commutativity property and the uniqueness of identifiers.
-As \cite{Shapiro-design} suggests, real numbers are suitable for the role of identifiers, but for implementation it would be necessary to be able to work with infinite precision and that is imposible. The solution for this is the Treedoc.
+Fundamental principle of this technique is that operations are executed localy and sent over the network to all other peers. There should be no need to preserve the order of the operations, this is due to commutativity property and the uniqueness of identifiers. This uniqeness also ensures that there is no need to transform operaions of provide suitable context because it is (jednoznacne) what atom should be edited.
+As \cite{Shapiro-design} suggests, real numbers are suitable for the role of identifiers, but for implementation it would be necessary to be able to work with infinite precision and that is imposible. The solution suggested by \cite{Shapiro-design} is the use of Treedoc. Algorithms using CRDTs differ mostly in the way of generating/maintaining these identifiesrs.
 \par Treedoc is an abstract data structure that is used in document editing. It is implemented as a binary tree and every node represents an atom in the structure. The UID is the path in the tree that starts in the root. Root's UID is empty string []. Figure~\ref{fig:treedoc} shows an example of this treedoc.
 \begin{figure}[H]
 \caption{Treedoc}
@@ -228,7 +228,7 @@ As \cite{Shapiro-design} suggests, real numbers are suitable for the role of ide
 \vspace{5mm}
 \includegraphics{treedoc1} 
 \end{figure}
-\par Figure encodes string 'uvwxyz' and uses characters as atoms. The UIDs for the characters are: u = [00], v = [0], w = [01], x = [], y = [1],\\z =[11]. This structure ensures the property, that it is always possible to generate new identifier between two existing UIDs. 
+\par Treedoc in figure encodes string 'uvwxyz' and uses characters as atoms. The UIDs for the characters are: u = [00], v = [0], w = [01], x = [], y = [1],\\z =[11]. This structure ensures the property, that it is always possible to generate new identifier between two existing UIDs. 
 \par In the end, the whole document consists of pairs (UID,atom). These are ordered by UIDs.  
 \par Delete operation is easy to implement. Deleting is simply replacing the atom in the node with null. If the deleted atom was a leaf it can be completely removed from memory, if it was an inner node it is kept in memory and garbage collected at some point in future. However, the leaf can be completely deleted only when the delete operation is stable, which according to \cite{Shapiro-design} means that has been executed on all sites of collaboration. This paper also introduces a new procedure gc(N), which removes leaf N if it is stably deleted. This operation is executed only localy.
 \par Insert opearation is harder to implement. The basic algorithm implementing this operation is not trying to keep the tree balanced, that is resolved later by other suitable solutions.  
