@@ -261,8 +261,7 @@ This section describes the comparison criteria for the presented techniques and 
 \par Comparison criteria include:
 \begin{itemize}
 \item client-server vs. peer to peer model
-\item requirements on local machine
-\item requirements on remote machine
+\item requirements on local machine vs. requirements on remote machine
 \item amount of data transfer
 \item network requirements
 \item time complexity
@@ -271,13 +270,17 @@ This section describes the comparison criteria for the presented techniques and 
 \end{itemize}
 \par It is important to determine whether the technique can be used only with client - server model or with peer to peer model or with both of them. With this requirement also related the scalability of the technique, how many participant could be in the collaboration. This is important for the use in practice, because this can be one of the most fundamental requirements of the system.
 \par One of the comparison criteria are performance requirements. These requirements should be reviewed as requirements on local machine vs. requirements on remote machine. Some techniques might have harder requiremts on the user side and other on server side.  Evaluation of these requirements is also dependent of the architecture.
-\par The amount of data transfer is also important. The more data is necessary to transfer the harder it is to implement this technique in enviroments with collaboration sites in distinct parts of the world. Best practice is to transfer as few data as possible.
+\par The amount of data transfer is also important. The more data is necessary to transfer the harder it is to implement this technique in enviroments with collaboration sites in distinct parts of the world. Best practice is to transfer as few data as possible. This criterion should be reviewed in costrast with other techniques.
 \par Network requirements should be taken into account, because it is necessary to know if one of the techniques requires particular protocol or some other network functionality. Some of the technniques may not be suitable for bigger networks like Internet, they may be suitable only for local area networks.
 \par Time complexity is very closely related to the requirements on the machines. It this requirement the overal speed of the algorithm is reviewed and the fastest is chosen. Some of the techniques might do the majority of the work in the algorithm, other may have done some preparation and the following algorithm is not so complex.
 \par Conflict resolution ability is also assessed. The main goal is to have as few conflicts as possible, but when some conflict occurs, it is necessary to resolve it as fast as possible and with the correct result. All of the techniques are able to resolve conflicts, but the important part is the correctnes of the result. 
 \par The best technique should be also able to tolarate the latency of the network. The ability to recover from lost packet situation or recover from situation when the packets come out of order is important. 
-\par In the last part of the comparison of the techniuqes a table should be presented to summarize the findings of this section.
 \section{Comparison}
+\par This section will evaluate the techniques according to presented criteria. In the last part of the comparison a table should be presented to summarize the findings of this section.
+\par \textbf{Operational transformation} \\
+- client-server vs. peer to peer model - All articles about Operational Transformation used in this thesis suggest the client - server model for this technique. The main reason why this technique can not be implemented with peer to peer model is the fact, that client has to send operations that come from a state in server's history. This would imply that every peer would have to preserve history of every other peer to be able to send such operations. This problem already occured in the design of Operational Transformation, and was resolved by moving the resposibility to track the history from server to clients. \\
+- requirements local vs. remote - In this technique are requirements on local machine slightly higher than on remote server. As mentioned above, client has to track server's history and only particular type of opeations. Server solves only the basic diamond problem and sends out operations that it receives.\\
+- amount of data transfer - Operational Transformation sends only operations over the network. 
 \chapter{Komodo}
 \section{Overview}
 \section{Komodo Requirements for Real-time Collaboration}
