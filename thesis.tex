@@ -8,7 +8,8 @@
 \usepackage{setspace}
 \usepackage{listings}
 \usepackage{enumitem}
-\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{epstopdf}
 \usepackage{float}
 \usepackage{mathtools}
 \thesistitle{Real-time collaboration in Komodo} 
@@ -89,7 +90,7 @@ Collaboration, as defined by English dictionary, is an act of working with anoth
 \label{fig:ot}
 \centering
 \vspace{5mm}
-\includegraphics{example}
+\includegraphics{op1}
 \end{figure}
 Both of them start with text 'TAX' in their document. Pointer starts at index 0 and operation retain() shifts the pointer by number of indexes given as parameter. Client wants to add character 'E' so he executes operations:
 \vspace{3mm}
@@ -131,7 +132,7 @@ In other words, the function takes two operations and transforms them against ea
 \label{fig:diamond1}
 \centering
 \vspace{5mm}
-\includegraphics{diamond}
+\includegraphics{diamond1}
 \end{figure}
 Operations done by peer take the document to the left side and operations done on server take the document to the right side. Each node in the diamond diagram represents the number of operations done by client and server in particular state. 
 \par As for the example, the correct scenario would be that peer and server exchange their operations, each one computes its transformation and applies the transformated operation on their versions of documents.
@@ -141,7 +142,7 @@ Operations done by peer take the document to the left side and operations done o
 \label{fig:diamond2}
 \centering
 \vspace{5mm}
-\includegraphics{diamond1}
+\includegraphics{diamond2}
 \end{figure}
 This example is used in \cite{Spiewak} On the server side, tranformation for operations \(a,c\) has to be computed, and server applies operation \(a'\) on its version of the document. The remaining operation \(c'\) has to be preserved for the next transformation. In the next step server must use \(b\) and \(c'\) as an input and computes \(b'\) that can be applied on its version of the document. Server's document is in the desired state. 
 \par On the client side, \(c\) has to be transformed against two operations to get to desired state. For two operations it is not a big problem, but as the number of operations could very quickly increase, because Operational Transformation is an optimistic technique, so it could potecially take long time to process. One of the advantages of Google Wave Operational Transformation is that it is able to compose the operations if they are compatible. This Composer is able to validate operations to make sure that they are compatible and compose them. One of the criteria for comatibility is that operations must span the same number of indexes.  If operations \(a\) and \(b\) are composed into operation \(d\), tranformation function can take operations \(d,c\) and produce operation \(c''\) that can be applied to peer's document and the document is in desired state. 
