@@ -1,4 +1,14 @@
 \documentclass[12pt,oneside]{fithesis2}
+\newenvironment{changemargin}[2]{%
+\begin{list}{}{%
+\setlength{\topsep}{0pt}%
+\setlength{\leftmargin}{#1}%
+\setlength{\rightmargin}{#2}%
+\setlength{\listparindent}{\parindent}%
+\setlength{\itemindent}{\parindent}%
+\setlength{\parsep}{\parskip}%
+}%
+\item[]}{\end{list}}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -7,7 +17,9 @@
 \usepackage{indentfirst}
 \usepackage{setspace}
 \usepackage{listings}
+\usepackage{lscape}
 \usepackage{enumitem}
+\usepackage{tabularx}
 \usepackage{graphics}
 \usepackage{epstopdf}
 \usepackage{float}
@@ -42,10 +54,12 @@
 \MainMatter
 \chapter{Introduction} 
 Many software solutions enable people to create new things in a better and faster way. In most cases the resulting product should be so complex that one person is not enuogh for the successful and fast creation. Creators try to collaborate to achive a common goal. Among other opportunities and possibilities are collaboration and sharing the greatest benefits of the Internet. \par
-We can identify two types of collaboration over the Internet, non real-time collaboration and real-time collaboration. At the beginning, as the Internet didn't have such capacity, people tried to use it just for sharing their drafts of work and sending them to each other, this type of collaboration is called non real-time. In non real-time collaboration users work on separate copies of a project and then need to merge their changes into one final project. In other words, they had to find differences between their drafts and reflect them to each other's version. It doesn't offer such flexibility as real-time collaboraion and also it had many limitations, for example two people could not edit the same file in a project without having to resolve confilicts manualy when they tried to merge their work with collaborator's version\par
-Examples of non real-time collaboration could be Revision control (Git, SVN).
-With the development of the Internet came a reasonable solution called real-time collaboration. Using this principle, author can see what his collaborator is doing in real-time and the manual synchronization or manual confilict resolution is not necessary. Information technologies take care of this synchronization and conflict resolution for the users.\par
-In the theoretical part of this thesis, author deals with principles of real-time collaboration and describes some of the techniques used to implement real-time collaboration in software over the Internet. There is also a comparison of these techniques from various aspects. The practical part of this thesis deals with JBoss Data Virtualization and Komodo software as a new version of Teiid Designer developed by Red Hat that should use real-time collaboration in its upcomming release. Author recommends best technique for this authoring software regarding the requirements of data models and finds a suitable implementation in Java programming language.
+We can identify two types of collaboration over the Internet, non real-time collaboration and real-time collaboration. 
+\par At the beginning, as the Internet didn't have such capacity, people tried to use it just for sharing their drafts of work and sending them to each other, this type of collaboration is called non real-time. In non real-time collaboration users work on separate copies of a project and then need to merge their changes into one final project. In other words, they had to find differences between their drafts and reflect them to each other's version. It doesn't offer such flexibility as real-time collaboraion and also it had many limitations, for example two people could not edit the same file in a project without having to resolve confilicts manualy when they tried to merge their work with collaborator's version\par
+Example of non real-time collaboration could be Revision control (Git, SVN).
+With the development of the Internet came a reasonable solution called real-time collaboration. Using this principle, author can see what his collaborator is doing in real-time and the manual synchronization or manual confilict resolution is not necessary. Information technologies take care of this synchronization and conflict resolution for the users.
+\par In the theoretical part of this thesis, we deal with principles of real-time collaboration and describe three of the techniques used to implement real-time collaboration in software over the Internet. In the following chapter, we set a comparison cirteria and try to compare these techniques in general. 
+\par The practical part of this thesis presents a brief description of Red Hat JBoss Data Virtualization and Teiid Designer and also presnets Komodo software as a new version of Teiid Designer. Komodo should use real-time collaboration in its upcomming release. We present the requirements of this software on the technique and recommend best one for this authoring software and find a suitable implementation in Java programming language.
 
 \chapter{Real-time collaboration}
 This chapter covers the basic overview of collaboration in general, description of real-time collaboration and description of difficulties with its implementation over the Internet. Last sections of this chapter describe three techniques used for implementation over the Internet and its properties. Techniques described in this chapter are: Operational Transformation, Differential Synchronization and Commutative replicated data types.
@@ -268,26 +282,101 @@ This section describes the comparison criteria for the presented techniques and 
 \item time complexity
 \item conflict resolution ability
 \item latency tolerance
+\item supported content formats
 \end{itemize}
-\par It is important to determine whether the technique can be used only with client - server model or with peer to peer model or with both of them. With this requirement also related the scalability of the technique, how many participant could be in the collaboration. This is important for the use in practice, because this can be one of the most fundamental requirements of the system.
+\par It is important to determine whether the technique can be used only with client - server model or with peer to peer model or with both of them. With this requirement also related the scalability of the technique, how many participant could be in the collaboration. This is important for the use in practice, because this can be one of the most fundamental requirements of the system. When evaluating this creteria, we assume that the number of collaboration sites is greater than two.
 \par One of the comparison criteria are performance requirements. These requirements should be reviewed as requirements on local machine vs. requirements on remote machine. Some techniques might have harder requiremts on the user side and other on server side.  Evaluation of these requirements is also dependent of the architecture.
 \par The amount of data transfer is also important. The more data is necessary to transfer the harder it is to implement this technique in enviroments with collaboration sites in distinct parts of the world. Best practice is to transfer as few data as possible. This criterion should be reviewed in costrast with other techniques.
 \par Network requirements should be taken into account, because it is necessary to know if one of the techniques requires particular protocol or some other network functionality. Some of the technniques may not be suitable for bigger networks like Internet, they may be suitable only for local area networks.
 \par Time complexity is very closely related to the requirements on the machines. This creterion focuses on the time complexity of the algorithms that ensure consistency maintanance. Some of the techniques might do the majority of the work in the algorithm, other may have done some preparation and the following algorithm is not so complex.
 \par Conflict resolution ability is also assessed. The main goal is to have as few conflicts as possible, but when some conflict occurs, it is necessary to resolve it as fast as possible and with the correct result. All of the techniques are able to resolve conflicts, but the important part is the correctnes of the result. 
 \par The best technique should be also able to tolarate the latency of the network. The ability to recover from lost packet situation or recover from situation when the packets come out of order is important. 
+\par The last criterion in ability to process various content formats. This part should point out the which formats are supported and which are not supported by particular technique.
 \section{Comparison}
-\par This section will evaluate the techniques according to presented criteria. In the last part of the comparison a table should be presented to summarize the findings of this section.
+\par This section evaluates the techniques according to presented criteria. The main part is devieded by techniques and by each technique all criteria are evaluated. In the last part of the comparison a table will be presented to summarize the findings of this section.
+
 \par \textbf{Operational transformation} \\
 - \underline{\smash{client-server vs. peer to peer model}} - All articles about Operational Transformation used in this thesis suggest the client - server model for this technique. The main reason why this technique can not be implemented with peer to peer model is the fact, that client has to send operations that come from a state in server's history. This would imply that every peer would have to preserve history of every other peer to be able to send such operations. This problem already occured in the design of Operational Transformation, and was resolved by moving the resposibility to track the history from server to clients. \\
-- \underline{\smash{requirements local vs. remote}} - In this technique are requirements on local machine slightly higher than on remote server. As mentioned above, client has to track server's history and only particular type of opeations. Server solves only the basic diamond problem and sends out operations that it receives.\\
-- \underline{amount of data transfer} - Operational Transformation sends only operations over the network. Only in network failures it is necessary to transfer the whole document.\\
-- \underline{\smash{network requirements}} - This technique assumes the use of connection over TCP protocol, in order to ensure the delivery. Although the mechanism should be able to detect lost packets, because server has to acknowledge operations.\\
-- \underline{\smash{time complexity}} - Time complexity for consistency maintanance is linear. For other more specific and more difficult functions, like undo can be the complexity non-liear.\\
-- \underline{\smash{conflict resolution ability}} - \\
+- \underline{\smash{requirements local vs. remote}} - In this technique are requirements on local machine slightly higher than on remote server. As mentioned above, client has to track server's history and send only particular type of opeations. Server solves only the basic diamond problem and sends out operations that it receives.\\
+- \underline{amount of data transfer} - Operational Transformation sends only operations over the network. Only in network failures it is necessary to transfer the whole document. The amount of data transfer necessary for this technique is low.\\
+- \underline{\smash{network requirements}} - This technique assumes the use of connection over TCP protocol\cite{Jupiter}\cite{simplified}, in order to ensure the delivery. Although the mechanism should be able to detect lost packets, because server has to acknowledge operations.\\
+- \underline{\smash{time complexity}} - Time complexity for consistency maintanance is linear.\cite{sequence}\cite{orthogonal} For other more specific and more difficult functions, like undo the complexity can be non-linear.\\
+- \underline{\smash{conflict resolution ability}} - The transformation function is the main part that ensures good conflict resolution. The role of this function is to transform the operations against each other in order to preserve user's intension, convergence and casuality.  \\
 - \underline{\smash{latency tolarenace}} - As it was mentioned above, server has to acknowledge user operations. This means that the chance that user operations will get lost is very small. This also implies that server preserves a version of the document on which all operations were apllied, in case of incosistency the whole document can be transferted to user.\\
-\chapter{Komodo}
+- \underline{\smash{supported content formats}} - Operational transformation is able to process plain text, but also variety of other formats like XML and other tree structured data types. This technique is used also in graphics editing systems\cite{graphics} like CoFlash and also for collaborative slides creation and presentation CoPowerPoint.
+
+\par \textbf{Differential synchronization} \\
+- \underline{\smash{client-server vs. peer to peer model}} - This technique is also not suitable for peer to peer model of architecture. It would be really computationaly complex for each client to maintan \((n-1)\) peer shadows and to compute \((n-1)\) diffs, also the patching would be really hard. With rising number of peers the real-time collaboration would be impossible to implement.\\
+- \underline{\smash{requirements local vs. remote}} - Differential sychronization has harder requiremts on server than on client. Fraser \cite{Fraser} points out that the algorithm is symetrical, which means that (nearly) identical code is running on all machines, but the final version of the algorithm presented in his paper is more difficult for server. It has to maintain another shadow for the case of dataloss and server is also responsible for broadcasting the operations to every client and for patching all operations on its document version.\\
+- \underline{amount of data transfer} - Data transfer might be the highest among these techniques because the changes made in document described in a diff file are provided with context, in order to find ther right place for paching.\\
+- \underline{\smash{network requirements}} - No special properties of network are necessary for this technique. Differential synchronization has a good mechanism that is able to recover from loss of packet so it can be implemented also over UDP protocol.\\
+- \underline{\smash{time complexity}} - Time complexity depends on diff and pach algorithms and can differ with the content format and with the choice of these algorithms as there can be more algorithms for particular content format. For example, one of diff algorithms for XML file is XyDiff\cite{Xdiff} and this algorithm achives \(O(nlogn)\) complexity in execeution time.\\
+- \underline{\smash{conflict resolution ability}} - This property depends on patch algorithm. One of roles of this algorithm is to identify the conflict and be able to resolve it with correct result. The choice of the algorithm is free so it can not be evaluated in general.  \\
+- \underline{\smash{latency tolarenace}} - There is a good guranteed delivery method used in this technique that is described in the previous chapter. Almost every situation can be resolved without having to send the whole document over the network.\\
+- \underline{\smash{supported content formats}} - Differential synchronization can be used with every format as long as there are diff and patch algorithms present. 
+
+\par \textbf{Commutative replicated data types} \\
+- \underline{\smash{client-server vs. peer to peer model}} - Peer to peer archtitecture is presented in most cases for this approach. Sites of collaboration only send the operations that have been done locally so there is an option to broadcast the operations to every peer and also to send operations to one server that will take care of broadcasting operations to other clients.\\
+- \underline{\smash{requirements local vs. remote}} - Requirements are equal on each site of the collaboration. Every site has to maintain correct order of identifiers and send\textbackslash receive operations. This also depends on the architecture. If a client-server model is choosen, the requirements on server would be heigher because server would have to broadcast the messages.\\
+- \underline{amount of data transfer} - Amount of data transfer in this approach is comparable to the amount neede in Operational Transformation. Atoms of the document are uniquely identified, so there is no need to provide context, only the operations and the identifier of the atom are sent over the network.\\
+- \underline{\smash{network requirements}} - Network requirements of CRDTs are not special. One of the reasons could be, that this technique concerns mainly with the identification of the atoms and doesn't concern with the newtwork problems, such as packetloss or packets that are out of order.\\
+- \underline{\smash{time complexity}} - Time complexity is depenedent on the choosen type of identifiers and with the algorithm that generates new identifiers. The technique itself only sends operations over the network, keypoint is the ability of the algorithm to generete new identifier or to find the correct place for insertion of new atom. It can not be evaluted in general as it was by Differential Synchronization. For example, according to \cite{CRDT-real} WOOT has a worst case time compexity of insert operation equal to \(O(n^3)\) and time complexity of delete is equal to \(O(n)\) where \(n\) is the number of atoms. Time complexity information for other algorithms can be also found in \cite{CRDT-real}\\
+- \underline{\smash{conflict resolution ability}} - Every atom is uniquely identified so there should be no conflict. Where there are two concurent operations that try to delete same atom, the second delete operation will find a tombstone and assume that is has been already deleted. Concurency of two insert operations at the same place is resolved individualy by each algorithm that generates identifiers. \\
+- \underline{\smash{latency tolarenace}} - As it is mentioned above, this techniques deals mainly with identification of the atoms, so the mechanism for latency tolerance is very weak. Every site basicly logs its operations (both local and remote). New site or crashed site will recieve whole document and a site that was disconnected for a while recieves all missing operations.\\
+- \underline{\smash{supported content formats}} - This technique can also support any format of content. The fundamental element is the devision of the content to atoms and their identification. 
+\iffalse \begin{changemargin}{-4.75cm}{-4.75cm} 
+\begin{landscape} \fi
+\newpage
+\noindent
+\begin{tabular}{| p{1.7cm} | p{2.2cm} | p{2.2cm} | p{2.2cm} | p{2.2cm} |}
+\hline
+ & C-S vs. p2p & local vs. remote* & data \newline transfer & network req.  \\
+\hline
+OT & C-S & local & low & use of TCP assumed \\
+\hline
+DS & C-S & remote & higher & no special \\
+\hline
+CRDTs & both & local & low & no special \\
+\hline
+\end{tabular}
+\newline
+\vspace*{1 cm}
+\newline
+\begin{tabular}{| p{1.7cm} | p{2.2cm} | p{2.2cm} | p{2.2cm} | p{2.2cm} |}
+\hline
+ & time** \newline complexity & conflict resolution & latency tolerance  mechanism & content formats \\
+\hline
+OT &  \(O(n)\) & X & average  & any \\
+\hline
+DS & \(O(nlogn)\) & X & strong  & any \\
+\hline
+CRDTs & \(O(n^3), O(n)\) & X & weak  & any \\
+\hline
+\end{tabular}
+\vspace{10mm}
+\newline
+* Table discribes on which site are the requirements higher. \newline
+** By all techniques time complexity is dependent on implementation, time complexities are only informative.
+\iffalse \end{landscape}
+\end{changemargin} \fi
+\chapter{Red Hat JBoss Data Virtualization}
+\par This chapter covers the practical part of the thesis, it describes briefly Red Hat JBoos Data Virtualization platform, an Eclipse-based design tooling called Teiid Designer and its new upcomming version Komodo. In the next section, it presents requiremets of Komodo for real-time collaboration and the following part deals with choosing the best technique for Komodo from three presented techniques in the theoretical part. The last part deals with Java implementation of this technique that can be used in acctual implementation of real-time collaboration in Komodo.
 \section{Overview}
+\par Red Hat JBoss Data Virtualization platform is a product based on community project called Teiid.  This software is able to federate and itegrate data sources of all kinds, like SQL datasources, non-SQL databases, Flat files, XML files, Excell files, webservices and more. It makes development of new applications easier, because the software developer doesn't have to query every datasource that his new application needs and federate the data in his application, Datava Virtualization platform will do this for the developer.
+\par This platform is able to create one virtual database called VDB that will federate all underlying datasources and make it look like there is only one datasource. It runs on top of aplication server called Red Hat JBoos Enterprise Aplication Platform.
+\par Users of this product are able to create VDBs 2 ways. One is to manually create an XML file with certain structure, this VDB is called dynamic VDB. In this VDB the user describes what datasource defined on server they want to use, there is also a security mechanism that is able to limit the access only for certain users and user can specify all needed information for federation of the datasources.
+\begin{figure}[H]
+\caption{Red Hat JBoss Data Virtualization}
+\label{fig:dv}
+\centering
+\vspace{5mm}
+\includegraphics[scale=0.15]{dv} 
+\end{figure} 
+\par Another alternative is to create a project in Teiid Designer. Teiid Designer is an eclipse-based designing tool for Data Virtualization. Using this tool it is much easier to create connections to remote and local datasource and also to federate them. User imports metadata from various datasources. These metadata about a datasource are represented in Teiid Designer by a Source model. User can specify which tables, columns or another type of structure they want to include in their project. There are also View models present, in which user can specify the federation schema and alter the structure of the tables provided by Source model. At the end the models are included in a static VDB file. Static VDBs are also files with XML structure but they are more complicated and not easy to create without tooling. 
+\par These VDBs are then deployed to Teiid server and external users/applications can query this new database. This VDB acts as one SQL database and doesn't expose the internal structure. User can choose also to produce a web service instead of a VDB. 
+\par Another benefit of Red Hat JBoss Data Virtualization is also the fact, that it enables quering datasources that are not easy to query without Data Vritualization, these datasources are for example Flat files, XML files and Excel spreadsheets. Teiid has a set of translators that are able to "translate" the content from various formats to teiid server logic.
+\section{Komodo}
+\par Komodo should be a new version of Teiid Designer, which has an improved approach to creating new VDBs and enables users to collaborate on created models. 
 \section{Komodo Requirements for Real-time Collaboration}
 \section{Best Technique for Komodo}
 \section{Java Implementation}
