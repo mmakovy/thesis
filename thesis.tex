@@ -271,8 +271,8 @@ In the next step, algorithm figures out whether one of atoms is ancestor of the 
 \par WOOT is one of the first algorithms that used CRDTs. The time complexity is not as good as Logoot's time complexity, this is caused mainly by thw use of thombstones. WOOT identifies characters as atoms and every character has a unique identifier, this atoms are called W-characters. This W-character is a tuple \( <id,\alpha,v,id_{cp},id_{cn}> \) where \(id\) is the identifier of the character, that is a cuple constructed of unique identification number of the site and a logical clock. \(\alpha\) is the actual value of the character. \(v\) is bolean value that represents visibility and \( id_{cp}, id_{cn} \) are identifiers of the previous and next character. These identifiers are the reason why there have to be the tombstones, they are necessary to indetify the exact position of the character on each site. Partial order between the atoms is defined and uniqness of the UIDs is ensured by a unique indetifier of the site and with the logical clock. The supported operations are also insert and delete. 
 \chapter{Comparison of Techniques}
 The following chapter will present a comparison of these thechniques using the criteria described in the following section. This chapter belongs to the teorecital part of the thesis, so the comparison is more general. It points out the general advantages and disadvantages of these techniques. 
-\section{Comparison Criteria}
-This section describes the comparison criteria for the presented techniques and presents the reasons for choosing these particular criteria.
+\section{Comparison Criteria} \label{comparison}
+This section describes the comparison criteria for the presented techniques and presents the reasons for choosing these particular criteria. These criteria together with other requirements are used in the section \ref{requirements} for desciribing Komodo requirements for real-time collaboration and in section \ref{best} for choosing the best technique.
 \par Comparison criteria include:
 \begin{itemize}
 \item client-server vs. peer to peer model
@@ -294,39 +294,115 @@ This section describes the comparison criteria for the presented techniques and 
 \par The last criterion in ability to process various content formats. This part should point out the which formats are supported and which are not supported by particular technique.
 \section{Comparison}
 \par This section evaluates the techniques according to presented criteria. The main part is devieded by techniques and by each technique all criteria are evaluated. In the last part of the comparison a table will be presented to summarize the findings of this section.
+\\
+\par \textbf{\underline{\smash{Operational transformation}}}
 
-\par \textbf{Operational transformation} \\
-- \underline{\smash{client-server vs. peer to peer model}} - All articles about Operational Transformation used in this thesis suggest the client - server model for this technique. The main reason why this technique can not be implemented with peer to peer model is the fact, that client has to send operations that come from a state in server's history. This would imply that every peer would have to preserve history of every other peer to be able to send such operations. This problem already occured in the design of Operational Transformation, and was resolved by moving the resposibility to track the history from server to clients. \\
-- \underline{\smash{requirements local vs. remote}} - In this technique are requirements on local machine slightly higher than on remote server. As mentioned above, client has to track server's history and send only particular type of opeations. Server solves only the basic diamond problem and sends out operations that it receives.\\
-- \underline{amount of data transfer} - Operational Transformation sends only operations over the network. Only in network failures it is necessary to transfer the whole document. The amount of data transfer necessary for this technique is low.\\
-- \underline{\smash{network requirements}} - This technique assumes the use of connection over TCP protocol\cite{Jupiter}\cite{simplified}, in order to ensure the delivery. Although the mechanism should be able to detect lost packets, because server has to acknowledge operations.\\
-- \underline{\smash{time complexity}} - Time complexity for consistency maintanance is linear.\cite{sequence}\cite{orthogonal} For other more specific and more difficult functions, like undo the complexity can be non-linear.\\
-- \underline{\smash{conflict resolution ability}} - The transformation function is the main part that ensures good conflict resolution. The role of this function is to transform the operations against each other in order to preserve user's intension, convergence and casuality.  \\
-- \underline{\smash{latency tolarenace}} - As it was mentioned above, server has to acknowledge user operations. This means that the chance that user operations will get lost is very small. This also implies that server preserves a version of the document on which all operations were apllied, in case of incosistency the whole document can be transferted to user.\\
-- \underline{\smash{supported content formats}} - Operational transformation is able to process plain text, but also variety of other formats like XML and other tree structured data types. This technique is used also in graphics editing systems\cite{graphics} like CoFlash and also for collaborative slides creation and presentation CoPowerPoint.
+\vspace{3mm}
 
-\par \textbf{Differential synchronization} \\
-- \underline{\smash{client-server vs. peer to peer model}} - This technique is also not suitable for peer to peer model of architecture. It would be really computationaly complex for each client to maintan \((n-1)\) peer shadows and to compute \((n-1)\) diffs, also the patching would be really hard. With rising number of peers the real-time collaboration would be impossible to implement.\\
-- \underline{\smash{requirements local vs. remote}} - Differential sychronization has harder requiremts on server than on client. Fraser \cite{Fraser} points out that the algorithm is symetrical, which means that (nearly) identical code is running on all machines, but the final version of the algorithm presented in his paper is more difficult for server. It has to maintain another shadow for the case of dataloss and server is also responsible for broadcasting the operations to every client and for patching all operations on its document version.\\
-- \underline{amount of data transfer} - Data transfer might be the highest among these techniques because the changes made in document described in a diff file are provided with context, in order to find ther right place for paching.\\
-- \underline{\smash{network requirements}} - No special properties of network are necessary for this technique. Differential synchronization has a good mechanism that is able to recover from loss of packet so it can be implemented also over UDP protocol.\\
-- \underline{\smash{time complexity}} - Time complexity depends on diff and pach algorithms and can differ with the content format and with the choice of these algorithms as there can be more algorithms for particular content format. For example, one of diff algorithms for XML file is XyDiff\cite{Xdiff} and this algorithm achives \(O(nlogn)\) complexity in execeution time.\\
-- \underline{\smash{conflict resolution ability}} - This property depends on patch algorithm. One of roles of this algorithm is to identify the conflict and be able to resolve it with correct result. The choice of the algorithm is free so it can not be evaluated in general.  \\
-- \underline{\smash{latency tolarenace}} - There is a good guranteed delivery method used in this technique that is described in the previous chapter. Almost every situation can be resolved without having to send the whole document over the network.\\
-- \underline{\smash{supported content formats}} - Differential synchronization can be used with every format as long as there are diff and patch algorithms present. 
+\textbf{Client-server vs. peer to peer model} - All articles about Operational Transformation used in this thesis suggest the client - server model for this technique. The main reason why this technique can not be implemented with peer to peer model is the fact, that client has to send operations that come from a state in server's history. This would imply that every peer would have to preserve history of every other peer to be able to send such operations. This problem already occured in the design of Operational Transformation, and was resolved by moving the resposibility to track the history from server to clients.
 
-\par \textbf{Commutative replicated data types} \\
-- \underline{\smash{client-server vs. peer to peer model}} - Peer to peer archtitecture is presented in most cases for this approach. Sites of collaboration only send the operations that have been done locally so there is an option to broadcast the operations to every peer and also to send operations to one server that will take care of broadcasting operations to other clients.\\
-- \underline{\smash{requirements local vs. remote}} - Requirements are equal on each site of the collaboration. Every site has to maintain correct order of identifiers and send\textbackslash receive operations. This also depends on the architecture. If a client-server model is choosen, the requirements on server would be heigher because server would have to broadcast the messages.\\
-- \underline{amount of data transfer} - Amount of data transfer in this approach is comparable to the amount neede in Operational Transformation. Atoms of the document are uniquely identified, so there is no need to provide context, only the operations and the identifier of the atom are sent over the network.\\
-- \underline{\smash{network requirements}} - Network requirements of CRDTs are not special. One of the reasons could be, that this technique concerns mainly with the identification of the atoms and doesn't concern with the newtwork problems, such as packetloss or packets that are out of order.\\
-- \underline{\smash{time complexity}} - Time complexity is depenedent on the choosen type of identifiers and with the algorithm that generates new identifiers. The technique itself only sends operations over the network, keypoint is the ability of the algorithm to generete new identifier or to find the correct place for insertion of new atom. It can not be evaluted in general as it was by Differential Synchronization. For example, according to \cite{CRDT-real} WOOT has a worst case time compexity of insert operation equal to \(O(n^3)\) and time complexity of delete is equal to \(O(n)\) where \(n\) is the number of atoms. Time complexity information for other algorithms can be also found in \cite{CRDT-real}\\
-- \underline{\smash{conflict resolution ability}} - Every atom is uniquely identified so there should be no conflict. Where there are two concurent operations that try to delete same atom, the second delete operation will find a tombstone and assume that is has been already deleted. Concurency of two insert operations at the same place is resolved individualy by each algorithm that generates identifiers. \\
-- \underline{\smash{latency tolarenace}} - As it is mentioned above, this techniques deals mainly with identification of the atoms, so the mechanism for latency tolerance is very weak. Every site basicly logs its operations (both local and remote). New site or crashed site will recieve whole document and a site that was disconnected for a while recieves all missing operations.\\
-- \underline{\smash{supported content formats}} - This technique can also support any format of content. The fundamental element is the devision of the content to atoms and their identification. 
-\iffalse \begin{changemargin}{-4.75cm}{-4.75cm} 
-\begin{landscape} \fi
-\newpage
+\vspace{3mm}
+
+\textbf{Requirements local vs. remote} - In this technique are requirements on local machine slightly higher than on remote server. As mentioned above, client has to track server's history and send only particular type of opeations. Server solves only the basic diamond problem and sends out operations that it receives.
+
+\vspace{3mm}
+
+\textbf{Amount of data transfer} - Operational Transformation sends only operations over the network. Only in network failures it is necessary to transfer the whole document. The amount of data transfer necessary for this technique is low.
+
+\vspace{3mm}
+
+\textbf{Network requirements} - This technique assumes the use of connection over TCP protocol\cite{Jupiter}\cite{simplified}, in order to ensure the delivery. Although the mechanism should be able to detect lost packets, because server has to acknowledge operations.
+
+\vspace{3mm}
+
+\textbf{Time complexity} - Time complexity for consistency maintanance is linear.\cite{sequence}\cite{orthogonal} For other more specific and more difficult functions, like undo the complexity can be non-linear.
+
+\vspace{3mm}
+
+\textbf{Conflict resolution ability} - The transformation function is the main part that ensures good conflict resolution. The role of this function is to transform the operations against each other in order to preserve user's intension, convergence and casuality.
+
+\vspace{3mm}
+
+\textbf{Latency tolarenace} - As it was mentioned above, server has to acknowledge user operations. This means that the chance that user operations will get lost is very small. This also implies that server preserves a version of the document on which all operations were apllied, in case of incosistency the whole document can be transferted to user.
+
+\vspace{3mm}
+
+\textbf{Supported content formats} - Operational transformation is able to process plain text, but also variety of other formats like XML and other tree structured data types. This technique is used also in graphics editing systems\cite{graphics} like CoFlash and also for collaborative slides creation and presentation CoPowerPoint.
+
+\vspace{3mm}
+
+\par \textbf{\underline{\smash{Differential Synchronization}}}
+
+\vspace{3mm}
+
+\textbf{Client-server vs. peer to peer model} - This technique is also not suitable for peer to peer model of architecture. It would be really computationaly complex for each client to maintan \((n-1)\) peer shadows and to compute \((n-1)\) diffs, also the patching would be really hard. With rising number of peers the real-time collaboration would be impossible to implement.
+
+\vspace{3mm}
+
+\textbf{Requirements local vs. remote} - Differential sychronization has harder requiremts on server than on client. Niel Fraser \cite{Fraser} points out that the algorithm is symetrical, which means that (nearly) identical code is running on all machines, but the final version of the algorithm presented in his paper is more difficult for server. It has to maintain another shadow for the case of dataloss and server is also responsible for broadcasting the operations to every client and for patching all operations on its document version.
+
+\vspace{3mm}
+
+\textbf{Amount of data transfer} - Data transfer might be the highest among these techniques because the changes made in document described in a diff file are provided with context, in order to find ther right place for paching.
+
+\vspace{3mm}
+
+\textbf{Network requirements} - No special properties of network are necessary for this technique. Differential synchronization has a good mechanism that is able to recover from loss of packet so it can be implemented also over UDP protocol.
+
+\vspace{3mm}
+
+\textbf{Time complexity} - Time complexity depends on diff and pach algorithms and can differ with the content format and with the choice of these algorithms as there can be more algorithms for particular content format. For example, one of diff algorithms for XML file is XyDiff\cite{Xdiff} and this algorithm achives \(O(nlogn)\) complexity in execeution time.
+
+\vspace{3mm}
+
+\textbf{Conflict resolution ability} - This property depends on patch algorithm. One of roles of this algorithm is to identify the conflict and be able to resolve it with correct result. The choice of the algorithm is free so it can not be evaluated in general.
+
+\vspace{3mm}
+
+\textbf{Latency tolarenace} - There is a good guranteed delivery method used in this technique that is described in the previous chapter. Almost every situation can be resolved without having to send the whole document over the network.
+
+\vspace{3mm}
+
+\textbf{Supported content formats} - Differential synchronization can be used with every format as long as there are diff and patch algorithms present.
+
+\vspace{3mm} 
+
+\par \textbf{\underline{\smash{Commutative replicated data types}}}
+
+\vspace{3mm} 
+
+\textbf{Client-server vs. peer to peer model} - Peer to peer archtitecture is presented in most cases for this approach. Sites of collaboration only send the operations that have been done locally so there is an option to broadcast the operations to every peer and also to send operations to one server that will take care of broadcasting operations to other clients.
+
+\vspace{3mm} 
+
+\textbf{Requirements local vs. remote} - Requirements are equal on each site of the collaboration. Every site has to maintain correct order of identifiers and send\textbackslash receive operations. This also depends on the architecture. If a client-server model is choosen, the requirements on server would be heigher because server would have to broadcast the messages.
+
+\vspace{3mm} 
+
+\textbf{Amount of data transfer} - Amount of data transfer in this approach is comparable to the amount neede in Operational Transformation. Atoms of the document are uniquely identified, so there is no need to provide context, only the operations and the identifier of the atom are sent over the network.
+
+\vspace{3mm} 
+
+\textbf{Network requirements} - Network requirements of CRDTs are not special. One of the reasons could be, that this technique concerns mainly with the identification of the atoms and doesn't concern with the newtwork problems, such as packetloss or packets that are out of order.
+
+\vspace{3mm} 
+
+\textbf{Time complexity} - Time complexity is depenedent on the choosen type of identifiers and with the algorithm that generates new identifiers. The technique itself only sends operations over the network, keypoint is the ability of the algorithm to generete new identifier or to find the correct place for insertion of new atom. It can not be evaluted in general as it was by Differential Synchronization. For example, according to \cite{CRDT-real} WOOT has a worst case time compexity of insert operation equal to \(O(n^3)\) and time complexity of delete is equal to \(O(n)\) where \(n\) is the number of atoms. Time complexity information for other algorithms can be also found in \cite{CRDT-real}.
+
+\vspace{3mm} 
+
+\textbf{Conflict resolution ability} - Every atom is uniquely identified so there should be no conflict. Where there are two concurent operations that try to delete same atom, the second delete operation will find a tombstone and assume that is has been already deleted. Concurency of two insert operations at the same place is resolved individualy by each algorithm that generates identifiers.
+
+\vspace{3mm} 
+
+\textbf{Latency tolarenace} - As it is mentioned above, this techniques deals mainly with identification of the atoms, so the mechanism for latency tolerance is very weak. Every site basicly logs its operations (both local and remote). New site or crashed site will recieve whole document and a site that was disconnected for a while recieves all missing operations.
+
+\vspace{3mm} 
+
+\textbf{Supported content formats} - This technique can also support any format of content. The fundamental element is the devision of the content to atoms and their identification. 
+
+\vspace{13mm} 
+
 \noindent
 \begin{tabular}{| p{1.7cm} | p{2.2cm} | p{2.2cm} | p{2.2cm} | p{2.2cm} |}
 \hline
@@ -336,7 +412,7 @@ OT & C-S & local & low & use of TCP assumed \\
 \hline
 DS & C-S & remote & higher & no special \\
 \hline
-CRDTs & both & local & low & no special \\
+CRDTs & both & equal & low & no special \\
 \hline
 \end{tabular}
 \newline
@@ -344,7 +420,7 @@ CRDTs & both & local & low & no special \\
 \newline
 \begin{tabular}{| p{1.7cm} | p{2.2cm} | p{2.2cm} | p{2.2cm} | p{2.2cm} |}
 \hline
- & time** \newline complexity & conflict resolution & latency tolerance  mechanism & content formats \\
+ & time** \newline complexity & conflict resolution*** & latency tolerance  mechanism & content formats \\
 \hline
 OT &  \(O(n)\) & X & average  & any \\
 \hline
@@ -356,9 +432,8 @@ CRDTs & \(O(n^3), O(n)\) & X & weak  & any \\
 \vspace{10mm}
 \newline
 * Table discribes on which site are the requirements higher. \newline
-** By all techniques time complexity is dependent on implementation, time complexities are only informative.
-\iffalse \end{landscape}
-\end{changemargin} \fi
+** By all techniques time complexity is dependent on implementation, time complexities are only informative. \newline
+*** Conflict resolution ability can not be compared in this table. In each case this ability depends on choosing particular function/algorithm.
 \chapter{Red Hat JBoss Data Virtualization}
 \par This chapter covers the practical part of the thesis, it describes briefly Red Hat JBoos Data Virtualization platform, an Eclipse-based design tooling called Teiid Designer and its new upcomming version Komodo. In the next section, it presents requiremets of Komodo for real-time collaboration and the following part deals with choosing the best technique for Komodo from three presented techniques in the theoretical part. The last part deals with Java implementation of this technique that can be used in acctual implementation of real-time collaboration in Komodo.
 \section{Overview}
@@ -372,13 +447,97 @@ CRDTs & \(O(n^3), O(n)\) & X & weak  & any \\
 \vspace{5mm}
 \includegraphics[scale=0.15]{dv} 
 \end{figure} 
-\par Another alternative is to create a project in Teiid Designer. Teiid Designer is an eclipse-based designing tool for Data Virtualization. Using this tool it is much easier to create connections to remote and local datasource and also to federate them. User imports metadata from various datasources. These metadata about a datasource are represented in Teiid Designer by a Source model. User can specify which tables, columns or another type of structure they want to include in their project. There are also View models present, in which user can specify the federation schema and alter the structure of the tables provided by Source model. At the end the models are included in a static VDB file. Static VDBs are also files with XML structure but they are more complicated and not easy to create without tooling. 
+\par Another alternative is to create a project in Teiid Designer. Teiid Designer is an eclipse-based designing tool for Data Virtualization. Using this tool it is much easier to create connections to remote and local datasource and also to federate them. User imports metadata from various datasources. These metadata about a datasource are represented in Teiid Designer by a Source model. User can specify which tables, columns or another type of structure they want to include in their project. There are also View models present, in which user can specify the federation schema and alter the structure of the tables provided by Source model. We can say that Source model represents the physical data storage and View model represents a business view of the data. At the end the models are included in a static VDB file. Static VDBs are also files with XML structure but they are more complicated and not easy to create without tooling. 
 \par These VDBs are then deployed to Teiid server and external users/applications can query this new database. This VDB acts as one SQL database and doesn't expose the internal structure. User can choose also to produce a web service instead of a VDB. 
 \par Another benefit of Red Hat JBoss Data Virtualization is also the fact, that it enables quering datasources that are not easy to query without Data Vritualization, these datasources are for example Flat files, XML files and Excel spreadsheets. Teiid has a set of translators that are able to "translate" the content from various formats to teiid server logic.
 \section{Komodo}
-\par Komodo should be a new version of Teiid Designer, which has an improved approach to creating new VDBs and enables users to collaborate on created models. 
-\section{Komodo Requirements for Real-time Collaboration}
-\section{Best Technique for Komodo}
+\par This section should provide some basic information about Komodo and the differences and improvements that will be included in Komodo. All information about Komodo that are presented in this section are from members of Komodo developing team or from Komodo Release Development plan \cite{Komodo}. 
+\par Komodo should be a new version of Teiid Designer, which has has many new features and tries to get the designing tool closer to Teiid server. The main impulses for creating a new tooling for Data Virtualization were changes in Teiid 8.x and the use of dynamic VDBs in Openshift platform.  
+\par The fundamental difference in architecture of this tool is the division in two parts. The KEngine and User Interface (UI). KEngine will be the main part that will handle all necessary functionality an will form the core of the application. This engine should adapt the common Teiid DDL dialect for relational data definition. KEngie will have Command Line Interface (CLI) through wich all activies will be possible to perform. User will be able to choose between CLI and UI.
+\par At the time of writing this thesis the CLI is beiing finalized. User will be able to create models and VDBs using few simple and understandable commands like CREATE, RENAME, DELETE, SET and others.
+\par User Interface will provide a clickable interface for users, to this day it was not decided if the UI will be web-based or Ecplise-based. New UI should not include Eclipse modeling framework used in Teiid Designer.
+\par Another change in Komodo is the use of ModeShape as a place for storing information about models and VDBs. Komodo won't use Ecplise workspace anymore. It should use KSpace , which will be a new workspace that is based on JCR e.g. ModeShape. 
+\par "ModeShape is a distributed, hierarchical, transactional, and consistent data store with support for queries, full-text search, events, versioning, references, and flexible and dynamic schemas."\cite{ModeShape} It implements the JSR-283\footnote{\url{https://jcp.org/en/jsr/detail?id=283}} standard Java API from content repositories also known as JCR. This kind of repository is a suitable solution for Komodo because it is good at storing hierarchical data, file storage also versioning and many other aspects. 
+\par Data in ModeShape are stored in a form of nodes connected to each other.  ModeShape has some basic node types deifned, but in most cases it is necessary to define custom nodes for the desired application. This definition of node types is called Compact Node Definition. Komodo nodes in repository will be Teiid Dynamic Artifacts. These artifacts are for example models, tables, colums, DDL statments and so on. Komodo has already prepared majority of these defiinitons\footnote{\url{https://raw.githubusercontent.com/Teiid-Designer/komodo/master/plugins/org.komodo.modeshape.teiid.sql.sequencer/cnd-examples/StandardDdl.cnd}}\footnote{\url{https://raw.githubusercontent.com/Teiid-Designer/komodo/master/plugins/org.komodo.modeshape.teiid.sql.sequencer/demigen/org/komodo/modeshape/teiid/cnd/TeiidSql.cnd}}. There is also a suggestion to use multiple local KSpaces and also remote KSpaces for the collaboration purposes. 
+\par One of major changes in approach of the modeling in this new tool, is that the creation of new VDB should be "VDB-centrinc" instead of "Project-centric". In other words the creation of VDB in Teiid Designer begins with creating a Model Project, as a next step user creates models and then they include these models in a VDB which is deployed to the server. Komodo won't use Projects, user will create an artifact an then it could be saved in a local library for later use. The workspace concept contains VBDs and/or models.\\ \\
+The major conceptual changes can be summarized in six points:
+\begin{enumerate}
+\item \textbf{Simplify terminology }- terminology of Teiid Designer is sightly different from the terminology used by Teiid. Komodo should eliminate these differences.
+\item \textbf{Replace the notion of "Source models" with "Data sources" }- This point is in strong relation with the first one. It is more understandable to name the base models as Datasources, as this terminlogy is also used by Teiid server.
+\item \textbf{Expose Create Views or Virtual Procedures as primary feature} - There is an effort to remove the diversity of models, Teiid Designer has a lot of model types such as Source, View, Relational, Web Service, XML and other. The number of models should be cut down and user will use simplier DDL constructions.
+\item \textbf{Exapad notion of a VDB in the workspace} - Komodo will implement Teiid's Dynamic VDB functionality
+\item \textbf{Ability to connect to multiple KSpaces} - Komodo will add an ability to have multiple local or remote workspaces as it was already mentioned above.
+\item \textbf{New global workspace location concept} - Stadard eclipse workspace has many drawbacks, for example when users switches workspace the connection profiles have to be exported from old workspace and reimported into the new one. Global workspace should store these common data outside of regular workspace.
+\end{enumerate}
+\section{Komodo Requirements for Real-time Collaboration} \label{requirements}
+\par This section describes the requirements on real-time collaboration that are set by Komodo software. All information presented in this section also come from \cite{Komodo} or from conversations with development team.
+
+\vspace{3mm} 
+
+\textbf{Architecture model} - Komodo is able to use Client - Server model in its implementation of the real-time collaboration. This approach seems to be more reliable and suitable for real-time collaboration. This is in relation with the requirement for number of collaboration sites.
+
+\vspace{3mm} 
+
+\textbf{Remote vs. local requirements} - There is no specification on wich side the requirements should be greater. Server will have to broadcast the changes and maintain a server version of the document, which means it will have to recieve changes from number of clients, on the other hand client deals with the actual modeling of the artifact and also with sending and recieving messages.
+
+\vspace{3mm} 
+
+\textbf{Amount of data transfer} - Obviously, the amount of data transfer should be as small as possible. In order to make the technique as fast as possible. The VDB files are as small as they can be, because they don't hold any data and store only DDLs for transformation of data into desired format.
+
+\vspace{3mm} 
+
+\textbf{Network requirements} - Komodo doesn't have any special network requiremts. Only requirement is that real-time collaboration should be implemented over Internet.
+
+\vspace{3mm} 
+
+\textbf{Latency tolerance} - As the real-time collaboration should be performed over the internet the latency tolerance should be as good as possible.
+
+\vspace{3mm} 
+
+\textbf{Data type} - Although Komodo will use ModeShape as a datastorage, real-time collaboration should deal with dynamic VDBs. These VBDs are in form of XML files as it was mentioned before. The structure of an example VDB.xml file can be seen in Komodo Release Development plan\cite{Komodo}. It mostly consists of few XML tags and DDL statments. This content format requirement is very important and has the main impact on the choice of the technique.
+
+\vspace{3mm} 
+
+\textbf{Number of participants} - The number of users collaborating on one model/vdb/artifact can be greater than two. The client-server model should be more suitable for the rising number of users. The chosen technique should be well scalable.
+
+\vspace{3mm} 
+
+\par Aspects of Time complexity and Conflict resolution ability are not mentioned because it is obvious that these two properties should be as good as possible.
+\section{Best Technique for Komodo} \label{best}
+\par This section deals with choosing from three presented techniques the best one for Komodo according to requirements set in the previous section. At the end of the section is short reasoning why we chose a CRDTs as the best technique for Komodo. 
+
+\vspace{3mm} 
+
+\textbf{Architecture model} - All three techniques are able to work with Client - Server model. This requirement doesn't rule out any of the presented techniques.
+
+\vspace{3mm} 
+
+\textbf{Remote vs. local requirements} - Komodo doesn't have limitations in this area. It is not necessary to rule out any of the techniques.
+
+\vspace{3mm} 
+
+\textbf{Amount of data transfer} - Operational transformation and CRDTs have the lowest data transfer. Differential synchronization seems to be less suitable for Komodo regarding this requirement.	
+
+\vspace{3mm} 
+
+\textbf{Network requirements} - Komodo has no special requirements for network. This aspect doesn't rule out any technique.
+
+\vspace{3mm} 
+
+\textbf{Latency tolerance} - Best latency tolerance mechanism is presented by Differential Synchronization, other two techniques do not significantly deal with latency tolerance in the presented papers, although it should be easy to add this mechanisms.
+
+\vspace{3mm} 
+
+\textbf{Data type} - All of the techniques are able to process any data format, in case of Dyfferential synchronization there should be diff and patch algorithms present for the desired data format. Operatational Transformation was implemented for Google Wave and this application worked with waves as XML files. There are also diff and patch algorithms present for XML files, one of the examples (XyDiff) is referenced in the section \ref{comparison}. CRDTs are able to process XML and might be a best solution for Komodo considering this aspect, because we can choose what part of data can be an atom for this technique. Not only whole XML tags can be considered as atoms, but also some main and stable parts of DDL such as CREATE, VIRTUAL PROCEDURE, SELECT, FROM, WHERE etc.
+
+\vspace{3mm} 
+
+\textbf{Number of participants} - This requirement seems to be the breakpoint in deciding what technique is the best for Komodo. As Niel Fraser \cite{Fraser} points out, there can be a scalability problem with rising number of participants by Differential Synchronization.
+
+\vspace{3mm} 
+
+We choose as a best technique for implementation in Komodo the technique of Commutative Replicated Data Types (CRDTs). Problem with scalability and higher data transfer in comparison with other two tehcniques rule out the Differential Sychronization as the best technique for Komodo. Operational transformation seems to be a good theoretical technique for real time collaboration, but implementing this technique on a reliable level is hard and considering real-time collaboration in Komodo as minor feature not the main feature of the software, the technique for real time collaboration should not be hard to implement. Google wave implementation of Operational Transformation, which is known today as Apache wave, is an open-source project and eventhough it could be used in Komodo, this implementation deals with XML files, it would not be easy to modify for Komodo. Positives of CRDTs are: the possibility to define larger parts of the document as atoms, low data transfer and compatibility with nearly any content type. 
+
 \section{Java Implementation}
 \chapter{Conclusion}
 \bibliographystyle{acm} 
